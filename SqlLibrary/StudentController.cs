@@ -10,6 +10,18 @@ namespace SqlLibrary
 
         public static BcConnection bcConnection { get; set; }
 
+        public static Student LoadStudentInstance(SqlDataReader reader) {
+            var student = new Student();
+            student.Id = Convert.ToInt32(reader["Id"]);
+            student.Firstname = reader["Firstname"].ToString();
+            student.Lastname = reader["Lastname"].ToString();
+            student.SAT = Convert.ToInt32(reader["SAT"]);
+            student.GPA = Convert.ToDouble(reader["GPA"]);
+            student.MajorId = Convert.IsDBNull(reader["MajorId"])
+               ? (int?)null 
+               : Convert.ToInt32(reader["MajorId"]);
+            return student;
+        }
 
         public static List<Student> GetAllStudents() { // pass the database an sql command
             var sql = "SELECT * From Student s left join Major m on m.Id= s.MajorId;";// sql syntax command to be passed
@@ -29,12 +41,13 @@ namespace SqlLibrary
             // methods that include ToString() which converts object to a string
             var students = new List<Student>();
             while (reader.Read()) {
-                var student = new Student();
-                student.Id = Convert.ToInt32(reader["Id"]);
-                student.Firstname = reader["Firstname"].ToString();
-                student.Lastname = reader["Lastname"].ToString();
-                student.SAT = Convert.ToInt32(reader["SAT"]);
-                student.GPA = Convert.ToDouble(reader["GPA"]);
+                var student = LoadStudentInstance(reader);
+                //               var student = new Student();
+                //               student.Id = Convert.ToInt32(reader["Id"]);
+                //               student.Firstname = reader["Firstname"].ToString();
+                //               student.Lastname = reader["Lastname"].ToString();
+                //               student.SAT = Convert.ToInt32(reader["SAT"]);
+                //               student.GPA = Convert.ToDouble(reader["GPA"]);
                 if (Convert.IsDBNull(reader["Description"])) {
 
                     student.Major = null;
@@ -59,18 +72,20 @@ namespace SqlLibrary
             var sql = $"SELECT * from Student Where ID = {id}";// if it was a string you have to enclose id with '' and should be tested some people would just put this in command directly without generating a variable
             var command = new SqlCommand(sql , bcConnection.Connection); // gets command ready to go
             var reader = command.ExecuteReader();
+ 
             if (!reader.HasRows) {
                 reader.Close();
                 reader = null;
                 return null;
             }
             reader.Read();
-            var student = new Student();
-            student.Id = Convert.ToInt32(reader["Id"]);
-            student.Firstname = reader["Firstname"].ToString();
-            student.Lastname = reader["Lastname"].ToString();
-            student.SAT = Convert.ToInt32(reader["SAT"]);
-            student.GPA = Convert.ToDouble(reader["GPA"]);
+            var student = LoadStudentInstance(reader);
+            //            var student = new Student();
+            //            student.Id = Convert.ToInt32(reader["Id"]);
+            //            student.Firstname = reader["Firstname"].ToString();
+            //            student.Lastname = reader["Lastname"].ToString();
+            //            student.SAT = Convert.ToInt32(reader["SAT"]);
+            //            student.GPA = Convert.ToDouble(reader["GPA"]);
             //student.MajorId = Convert.ToInt32(reader["MajorId"]);
             reader.Close();
             reader = null;
@@ -113,11 +128,11 @@ namespace SqlLibrary
 
         public static bool UpdateStudent(Student student) {
             var sql = "Update Student Set" +
-                " Firstname = @Firstname', " +
-                " Lastname = @Lastname, " +
-                " SAT= @SAT" +
-                " GPA = @GPA" +
-                " MajorId = @MajorID " +
+                " Firstname = @Firstname, " +
+                " Lastname = @Lastname," +
+                " SAT= @SAT," +
+                " GPA = @GPA," +
+                " MajorId = @MajorId" +
                 " Where Id = @Id; ";
             var command = new SqlCommand(sql , bcConnection.Connection);
             command.Parameters.AddWithValue("@Id" , student.Id);

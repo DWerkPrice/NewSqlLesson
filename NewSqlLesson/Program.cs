@@ -11,12 +11,24 @@ namespace SqlLesson
 
             var sqllib = new BcConnection();
             sqllib.Connect(@"localhost\sqlexpress" , "EdDb" , "trusted_connection=true");
+           
             MajorController.bcConnection = sqllib;
+            
+            var Major = MajorController.GetMajorByPk(1);
+            Console.WriteLine(Major);
 
             var majors = MajorController.GetAllMajors();
             foreach(var major in majors) {
                 Console.WriteLine(major);
             }
+
+            // insert new major
+//            var newMajor = new Major {
+//                Id = 11 ,
+//                Description = "Graphics Design" ,
+//                MinSAT = 1100
+//            };
+//            var successmjins = MajorController.InsertMajor(newMajor);
 
 
             StudentController.bcConnection = sqllib; // setting property to instance
@@ -38,6 +50,9 @@ namespace SqlLesson
             }else {
                 Console.WriteLine(student);
             }
+
+
+
             student.Firstname = "Charlie";
             student.Lastname = "Chan";
             var success = StudentController.UpdateStudent(student);

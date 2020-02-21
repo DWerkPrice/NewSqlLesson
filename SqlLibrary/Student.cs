@@ -21,7 +21,7 @@ namespace SqlLibrary
         }
 
 
-        public Student() { }
+        public Student() {}
     }
 }
 
